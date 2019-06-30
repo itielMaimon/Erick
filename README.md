@@ -12,3 +12,12 @@ A Personal Voice Assistant
    > Just say `what's the time`.
 - <b>General questions</b>
    > Say anything like `who is Elon Musk`, `what's an umbrella`, `tell me about World War II`.
+
+## Installation   
+### Requirements
+- <b>OS: Windows</b>
+- <b>Python 3.x</b>
+
+1. `$ git clone https://github.com/itielMaimon/Erick.git`
+2. `$ cd Erick` 
+3. `$ pip install -r requirements.txt`
