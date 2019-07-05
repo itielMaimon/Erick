@@ -214,7 +214,7 @@ def assistant(command):
             Client = urlopen(news_url)
             xml_page = Client.read()
             Client.close()
-            soup_page = BeautifulSoup(xml_page, "lxml")
+            soup_page = BeautifulSoup(xml_page, "html.parser")
             news_list = soup_page.findAll("item")
             for news in news_list[:5]:
                 erickResponse(news.title.text)

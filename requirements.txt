@@ -2,6 +2,5 @@ SpeechRecognition
 pyttsx3
 beautifulsoup4
 requests
-lxml
 wikipedia
 wolframalpha
