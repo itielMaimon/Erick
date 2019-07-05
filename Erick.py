@@ -25,7 +25,7 @@ voices = engine.getProperty('voices')   # Getting details of current voice
 # Changing index, changes voices. o for male, 1 for female
 engine.setProperty('voice', voices[0].id)
 
-welcomeMessage = 'Hi, I am Erick, your personal voice assistant. How can I help you?'
+welcomeMessage = 'Hi, I am Erick, your intelligent virtual assistant. How can I help you?'
 print(welcomeMessage)
 engine.say(welcomeMessage)
 engine.runAndWait()
@@ -66,7 +66,7 @@ def assistant(command):
     if 'your name' in command:
         erickResponse('My name is Erick. Nice to meet you!')
     elif 'who are you' in command:
-        erickResponse('I\'m Erick, your personal voice assistant!')
+        erickResponse('I\'m Erick, your intelligent virtual assistant!')
     elif 'do you feel' in command:
         erickResponse('I\'m doing great, thanks for asking.')
     elif 'old are you' in command:

@@ -1,5 +1,5 @@
 # Erick
-### A Personal Voice Assistant
+### An Intelligent Virtual Assistant
 
 ![](Erick.jpg)
 
