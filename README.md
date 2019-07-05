@@ -7,13 +7,15 @@
 - <b>Personal questions</b>
    > Say anything like `how do you feel`, `how old are you`, `who built you`.
 - <b>Open Twitter and Instagram</b>
-   > Say anything like `open Twitter` or `open Instagram 9gag`.
+   > Say anything like `open twitter` or `open instagram 9gag` for a specific account.
+- <b>Open a subreddit</b>
+   > Say anything like `open reddit python`.   
 - <b>Open any webpage</b>
    > Say anything like `open xyz.com`.
 - <b>Search on Google</b>
    > Just say `search xyz`.
 - <b>Play songs on Youtube</b>
-   > Say anything like `play mirrors`.
+   > Say anything like `play shape of you`, `play mirrors`.
 - <b>Launch apps</b>
    > Say anything like `launch calc`.   
 - <b>Get the time</b>
@@ -23,7 +25,7 @@
 - <b>Lock the device</b>
    > Say anything like `lock my devide`.   
 - <b>General questions</b>
-   > Say anything like `who is Elon Musk`, `what's an umbrella`, `tell me about World War II`.
+   > Say anything like `who is elon musk`, `what's an umbrella`, `tell me about wowrld war ii`.
 
 ## Installation   
 ### Requirements
