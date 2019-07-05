@@ -1,7 +1,7 @@
 SpeechRecognition
-pypiwin32
 pyttsx3
 beautifulsoup4
-youtube-dl
-pyowm
+requests
+lxml
 wikipedia
+wolframalpha

@@ -1,0 +1,1 @@
+extension-pkg-whitelist = wx, win32api, win32file, win32process

@@ -1,5 +1,4 @@
 import speech_recognition as sr
-import os
 import pyttsx3
 import sys
 import re
@@ -7,32 +6,34 @@ import webbrowser
 import smtplib
 import requests
 import subprocess
-from pyowm import OWM
-import youtube_dl
-import urllib
-import urllib3
-import json
-from bs4 import BeautifulSoup as soup
+from bs4 import BeautifulSoup
 from urllib.request import urlopen
 import wikipedia
-import random
+import wolframalpha
+import ctypes
 import datetime
 from time import strftime
 
 engine = pyttsx3.init()
 
-""" RATE"""
+# RATE
 rate = engine.getProperty('rate')   # Getting details of current speaking rate
 engine.setProperty('rate', 170)     # Setting up new voice rate
 
-"""VOICE"""
+# VOICE
 voices = engine.getProperty('voices')   # Getting details of current voice
 # Changing index, changes voices. o for male, 1 for female
 engine.setProperty('voice', voices[0].id)
 
-engine.say("Hi, I am Erick, your personal voice assistant, how can I help you?")
+welcomeMessage = 'Hi, I am Erick, your personal voice assistant. How can I help you?'
+print(welcomeMessage)
+engine.say(welcomeMessage)
 engine.runAndWait()
-engine.stop()
+
+headers = {
+    'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36'}
+
+app_id = 'wolfram_API'   # wolfram_API_here
 
 
 def newCommand():
@@ -60,21 +61,22 @@ def erickResponse(audio):
 
 def assistant(command):
     # if statements for executing commands
+
     # Questions about Erick
     if 'your name' in command:
         erickResponse('My name is Erick. Nice to meet you!')
     elif 'who are you' in command:
         erickResponse('I\'m Erick, your personal voice assistant!')
     elif 'do you feel' in command:
-        erickResponse('I\'m doing great, thanks for asking.')        
+        erickResponse('I\'m doing great, thanks for asking.')
     elif 'old are you' in command:
-        erickResponse('I\'m 2 days old, but growing fastly.')
+        erickResponse('I was launched in June of 2019, but growing fastly.')
     elif 'who built you' in command:
         erickResponse(
             'Itiel Maimon, the greatest programmer of all time built me.')
     elif 'what can you do' in command:
         erickResponse(
-            'I can do a lot of things, to help you throut your day.')
+            'I can do a lot of things, to help you throughout your day.')
     elif 'help me' in command:
         erickResponse('I\'m here to help, you can ask me what I can do.')
     elif 'like siri' in command:
@@ -84,17 +86,17 @@ def assistant(command):
     elif 'hello' in command:
         day_time = int(strftime('%H'))
         if day_time < 12:
-            erickResponse('Hello Sir. Good morning!')
+            erickResponse('Hello, Good morning!')
         elif 12 <= day_time < 18:
-            erickResponse('Hello Sir. Good afternoon!')
+            erickResponse('Hello, Good afternoon!')
         else:
-            erickResponse('Hello Sir. Good evening!')
+            erickResponse('Hello, Good evening!')
     elif 'thank you' in command:
         erickResponse('You\'re Welcome!')
 
     # Make Erick stop
     elif 'shut down' in command:
-        erickResponse('Bye bye Sir. Have a nice day!')
+        erickResponse('Bye bye. Have a nice day!')
         sys.exit()
 
     # Open Twitter
@@ -105,7 +107,8 @@ def assistant(command):
             handle = reg_ex.group(1)
             url = url + handle
         webbrowser.open(url)
-        erickResponse('The requested Twitter account has been opened for you Sir.')
+        erickResponse(
+            'Opening Twitter.')
 
     # Open Instagram
     elif 'open instagram' in command:
@@ -115,7 +118,8 @@ def assistant(command):
             handle = reg_ex.group(1)
             url = url + handle
         webbrowser.open(url)
-        erickResponse('The requested Instagram account has been opened for you Sir.')
+        erickResponse(
+            'Opening Instagram.')
 
     # Open subreddit Reddit
     elif 'open reddit' in command:
@@ -125,20 +129,47 @@ def assistant(command):
             subreddit = reg_ex.group(1)
             url = url + 'r/' + subreddit
         webbrowser.open(url)
-        erickResponse('The requested Reddit content has been opened for you Sir.')
+        erickResponse(
+            'Opening Reddit.')
 
-    # Open website
-    elif 'go to' in command:
-        reg_ex = re.search('go to (.+)', command)
+    # Open any website
+    elif 'open' in command:
+        reg_ex = re.search('open (.+)', command)
         if reg_ex:
             domain = reg_ex.group(1)
-            print(domain)
             url = 'https://www.' + domain
             webbrowser.open(url)
             erickResponse(
-                'The website you have requested has been opened for you Sir.')
-        else:
-            pass
+                'Opening ' + domain)
+
+    # Make a search on Google
+    elif 'search' in command:
+        reg_ex = re.search('search (.+)', command)
+        if reg_ex:
+            subject = reg_ex.group(1)
+            url = 'https://www.google.com/search?q=' + subject
+            webbrowser.open(url)
+            erickResponse(
+                'Searching for ' + subject + ' on Google.')
+
+    # Play a song on Youtube
+    elif 'play' in command:
+        reg_ex = re.search('play (.+)', command)
+        if reg_ex:
+            searchedSong = reg_ex.group(1)
+            url = 'https://www.youtube.com/results?q=' + searchedSong
+            try:
+                source_code = requests.get(url, headers=headers, timeout=15)
+                plain_text = source_code.text
+                soup = BeautifulSoup(plain_text, "html.parser")
+                songs = soup.findAll('div', {'class': 'yt-lockup-video'})
+                song = songs[0].contents[0].contents[0].contents[0]
+                hit = song['href']
+                webbrowser.open('https://www.youtube.com' + hit)
+                erickResponse('Playing ' + searchedSong + ' on Youtube.')
+            except Exception as e:
+                webbrowser.open(url)
+                erickResponse('Searching for ' + searchedSong + ' on Youtube.')
 
     # Send Email
     elif 'email' in command:
@@ -147,31 +178,56 @@ def assistant(command):
         if 'someone' in recipient:
             erickResponse('What should I say to him?')
             content = newCommand()
-            mail = smtplib.SMTP('smtp.gmail.com', 587)
-            mail.ehlo()
-            mail.starttls()
-            mail.login('sender_email', 'sender_password')
-            mail.sendmail('sender_email', 'receiver_email', content)
-            mail.close()
-            erickResponse(
-                'Email has been sent successfuly. You can check your inbox.')
+            try:
+                mail = smtplib.SMTP('smtp.gmail.com', 587)
+                mail.ehlo()
+                mail.starttls()
+                mail.login('sender_email', 'sender_password')
+                mail.sendmail('sender_email', 'receiver_email', content)
+                mail.close()
+                erickResponse(
+                    'Email has been sent successfuly.')
+            except Exception as e:
+                print(e)
         else:
-            erickResponse('I don\'t know what you mean!')
+            erickResponse('I don\'t know anyone named ' + recipient + '.')
 
     # Launch apps
-    elif 'open' in command:
-        reg_ex = re.search('open (.*)', command)
+    elif 'launch' in command:
+        reg_ex = re.search('launch (.*)', command)
         if reg_ex:
             appname = reg_ex.group(1)
             appname1 = appname+".exe"
             subprocess.call([appname1])
-            erickResponse('I have launched the requested application.')
+            erickResponse('Launching ' + appname + '.')
 
     # Get current time
     elif 'time' in command:
         now = datetime.datetime.now()
-        erickResponse('Current time is %d hours %d minutes.' %
-                       (now.hour, now.minute))
+        erickResponse('Current time is %d:%d.' %
+                      (now.hour, now.minute))
+
+    # Get recent news
+    elif 'news' in command:
+        try:
+            news_url = "https://news.google.com/news/rss"
+            Client = urlopen(news_url)
+            xml_page = Client.read()
+            Client.close()
+            soup_page = BeautifulSoup(xml_page, "lxml")
+            news_list = soup_page.findAll("item")
+            for news in news_list[:5]:
+                erickResponse(news.title.text)
+        except Exception as e:
+            print(e)
+
+    # Lock the device
+    elif 'lock' in command:
+        try:
+            erickResponse("Locking the device.")
+            ctypes.windll.user32.LockWorkStation()
+        except Exception as e:
+            print(str(e))
 
     # Ask general questions
     elif 'tell me about' in command:
@@ -179,31 +235,33 @@ def assistant(command):
         try:
             if reg_ex:
                 topic = reg_ex.group(1)
-                ny = wikipedia.page(topic)
-                erickResponse(ny.content[:300].encode('utf-8'))
+                erickResponse(wikipedia.summary(topic, sentences=3))
         except Exception as e:
-            print(e)
             erickResponse(e)
-    elif 'what is' in command:
-        reg_ex = re.search('what is (.*)', command)
+    elif any(c in command for c in ("what is", "what\'s")):
+        reg_ex = re.search(' (.*)', command)
         try:
             if reg_ex:
                 topic = reg_ex.group(1)
-                ny = wikipedia.page(topic)
-                erickResponse(ny.content[:200].encode('utf-8'))
+                erickResponse(wikipedia.summary(topic, sentences=2))
         except Exception as e:
-            print(e)
             erickResponse(e)
-    elif 'who is' in command:
-        reg_ex = re.search('who is (.*)', command)
+
+    # All other cases
+    else:
         try:
-            if reg_ex:
-                topic = reg_ex.group(1)
-                ny = wikipedia.page(topic)
-                erickResponse(ny.content[:100].encode('utf-8'))
-        except Exception as e:
-            print(e)
-            erickResponse(e)
+            # wolframalpha
+            client = wolframalpha.Client(app_id)
+            res = client.query(command)
+            answer = next(res.results).text
+            erickResponse(answer)
+        except:
+            try:
+                # wikipedia
+                erickResponse(wikipedia.summary(command, sentences=2))
+            except Exception as e:
+                erickResponse(e)
+
 
 while True:
     assistant(newCommand())
